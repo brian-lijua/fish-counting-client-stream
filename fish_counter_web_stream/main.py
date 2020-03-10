@@ -1,6 +1,7 @@
 from flask import Flask, request, Response, render_template, stream_with_context
-from imutils.video import FileVideoStream
+from imutils.video import FileVideoStream, VideoStream
 import os
+import argparse
 import cv2
 import time
 import datetime
@@ -21,8 +22,10 @@ VIDEO_WRITER_QUEUE = None
 def index():
     return render_template('index.html')
 
-def read_feed():    
-    cap = FileVideoStream('sample/fish3.mp4').start()
+def read_feed():
+    cap = VideoStream(usePiCamera=True)        
+    cap.start()
+    # cap = FileVideoStream('sample/fish3.mp4').start()
     frame = cap.read()
 
     global VIDEO_HEIGHT, VIDEO_WIDTH
@@ -30,7 +33,7 @@ def read_feed():
 
     time.sleep(2.0)
     try:
-        while cap.more():
+        while True:
             frame = cap.read()
             jpeg_frame = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), 90])[1]
 
@@ -40,7 +43,7 @@ def read_feed():
             yield (b'--frame\r\n'
                 b'Content-Type: image/jpeg\r\n\r\n' + jpeg_frame.tostring() + b'\r\n')
     finally:
-        cap.stop()        
+        cap.stop()
 
 @app.route('/video_feed')
 def video_feed():    
