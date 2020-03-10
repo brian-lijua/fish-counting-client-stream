@@ -1,0 +1,68 @@
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+.custom-container {
+    padding-top: 30px;
+}
+
+.nav-wrapper {
+    background-color: transparent;
+    box-shadow: none;
+}
+
+.nav-wrapper .brand-logo {
+    color: white;    
+}
+
+.custom-collection {
+    margin: 0;
+}
+
+.video_feed {
+    position: relative;
+}
+
+.video_feed > img{
+    width: 100%;
+    height: auto;
+}
+
+.video_feed > .material-icons {
+    position: absolute; 
+    top: 5px;
+    right: 5px;    
+    color: springgreen;
+    animation: blinker 5s linear infinite;
+}
+
+@media only screen and (min-width: 1000px) {
+    nav .brand-logo {
+        left:8%;
+        -webkit-transform:translateX(-50%);
+        transform:translateX(-50%)
+    }
+}
+
+@media only screen and (max-width: 992px) {
+    nav .brand-logo {
+        left:15%;
+        -webkit-transform:translateX(-50%);
+        transform:translateX(-50%)
+    }
+}
+
+.show-el {
+    display: block;
+}
+
+.material-icons.hide-el {
+    display: none;
+}
+
+@keyframes blinker {
+    50% {
+      color: black;
+    }
+}

@@ -1,9 +1,84 @@
+<!DOCTYPE html>
 <html>
   <head>
     <title>Video Streaming Demonstration</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='materialize/css/materialize.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="{{ url_for('static', filename='materialize/js/materialize.min.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var elems = document.querySelectorAll('.sidenav');
+            var instances = M.Sidenav.init(elems);
+        });
+    </script>
+    <script>
+        var isRecording = false;
+        function startRecording() {
+            var startButton = document.getElementById('startRecord')
+            var stopButton = document.getElementById('stopRecord')
+            var recordIcon = document.getElementById('iconRecord')
+
+            startButton.classList.add('disabled')
+            stopButton.classList.remove('disabled')            
+            recordIcon.classList.remove('hide-el')
+
+            signalRecord('start')
+
+            return false
+        }
+
+        function stopRecording() {
+            var startButton = document.getElementById('startRecord')
+            var stopButton = document.getElementById('stopRecord')
+            var recordIcon = document.getElementById('iconRecord')
+            
+            startButton.classList.remove('disabled')
+            stopButton.classList.add('disabled')    
+            recordIcon.classList.add('hide-el')   
+
+            signalRecord('stop')     
+
+            return false
+        }
+
+        function signalRecord(type) {
+            fetch('/start_recording', {
+                method: 'POST',
+                body: `type=${type}`,       
+                headers: { 'Content-type': 'application/x-www-form-urlencoded' }         
+            }).then(function(resp) {
+                console.log(resp)
+            }).catch(function(err) {
+                console.log(err)
+            })
+        }
+    </script>
   </head>
   <body>
-    <h1>Video Streaming Demonstration</h1>
-    <img src="{{ url_for('video_feed') }}">
+    <nav>
+        <div class="nav-wrapper teal darken-1">
+            <span class="brand-logo">
+                Record
+            </span>
+            <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>            
+        </div>
+    </nav>
+    <ul class="sidenav" id="mobile-demo">
+        <li><a href="sass.html">Record</a></li>
+        <li><a href="badges.html">History</a></li>        
+    </ul>
+    <div class="container custom-container">
+        <div class="row"> 
+            <a id="startRecord" onclick="startRecording()" class="waves-effect waves-light btn">Record</a>
+            <a id="stopRecord" onclick="stopRecording()" class="waves-effect waves-light btn red lighten-1 disabled">Stop</a>            
+        </div>
+        <div class="row video_feed">
+            <i id="iconRecord" class="medium material-icons hide-el">camera_alt</i>
+            <img src="{{ url_for('video_feed') }}">
+        </div>
+    </div>    
   </body>
 </html>
