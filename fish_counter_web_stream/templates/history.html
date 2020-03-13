@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Video Streaming Demonstration</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='materialize/css/materialize.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="{{ url_for('static', filename='materialize/js/materialize.min.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var elems = document.querySelectorAll('.sidenav');
+            var instances = M.Sidenav.init(elems);
+        });
+    </script>
+    <script>
+        
+    </script>
+  </head>
+  <body>
+    <nav>
+        <div class="nav-wrapper teal darken-1">
+            <span class="brand-logo">
+                History
+            </span>
+            <a href="#" data-target="sidenav" class="sidenav-trigger always-show"><i class="material-icons">menu</i></a>            
+        </div>
+    </nav>
+    <ul class="sidenav" id="sidenav">
+        <li><a href="/">Record</a></li>
+        <li><a href="/history">History</a></li>        
+    </ul>
+    <div class="container custom-container">        
+        <div class="collection">
+            {% for file in files %}
+                <a href="download/{{ file }}" class="collection-item" download="{{ file }}">{{ file }}</a>
+            {% endfor %}
+<!--             
+            <a href="#!" class="collection-item active">Alvin</a>
+            <a href="#!" class="collection-item">Alvin</a>
+            <a href="#!" class="collection-item">Alvin</a> -->
+        </div>
+            
+        
+    </div>    
+  </body>
+</html>

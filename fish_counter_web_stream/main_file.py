@@ -1,4 +1,4 @@
-from flask import Flask, request, Response, render_template, stream_with_context
+from flask import Flask, request, Response, render_template, stream_with_context, send_file, send_from_directory, url_for
 from imutils.video import FileVideoStream, VideoStream
 import os
 import argparse
@@ -12,8 +12,8 @@ from queue import Queue
 app = Flask(__name__)
 app.debug = True
 
-VIDEO_HEIGHT = 720
-VIDEO_WIDTH = 1280
+VIDEO_HEIGHT = None
+VIDEO_WIDTH = None
 
 VIDEO_IS_RECORDING = False
 VIDEO_WRITER_THREAD = None
@@ -24,12 +24,15 @@ def index():
     return render_template('index.html')
 
 def read_feed():
-    cap = VideoStream(usePiCamera=True, resolution=(VIDEO_WIDTH, VIDEO_HEIGHT))        
-    cap.start()
-    # cap = FileVideoStream('sample/fish3.mp4').start()
-    frame = cap.read()    
-
+    #cap = VideoStream(usePiCamera=True, resolution=(VIDEO_WIDTH, VIDEO_HEIGHT))            
+    cap = FileVideoStream('sample/fish3.mp4').start()
+    
     time.sleep(2.0)
+
+    frame = cap.read()    
+    global VIDEO_HEIGHT, VIDEO_WIDTH
+    VIDEO_HEIGHT, VIDEO_WIDTH = frame.shape[:2]
+    
     try:
         while True:
             frame = cap.read()
@@ -50,7 +53,7 @@ def video_feed():
 
 def writeToVide(q):
     filename =  '{}.mp4'.format(datetime.datetime.now().strftime("%Y%m%d_%H%M%S"))
-    filepath = os.path.join('temp', filename)    
+    filepath = os.path.join(app.root_path, 'recorded', filename)    
     fourcc = cv2.VideoWriter_fourcc(*'avc1')
     writer = cv2.VideoWriter(filepath, fourcc, 30.0, (int(VIDEO_WIDTH), int(VIDEO_HEIGHT)))
     # global VIDEO_IS_RECORDING
@@ -88,6 +91,26 @@ def start_recording():
         return Response('stopped')
     else:
         return Response('Invalid resposned')
-    
+
+@app.route('/history')
+def history_page():
+    files = os.listdir(os.path.join(app.root_path, 'recorded'))
+    files = reversed(files)
+    return render_template('history.html', files=files)
+
+@app.route('/download/<path:fid>/')
+def download(fid):
+    fp = os.path.join(app.root_path, 'recorded', fid)
+    with open(fp, 'rb') as f:
+        retFile = f.read()
+
+    return Response(retFile, 200, mimetype='video/mp4', headers={'Content-Type': 'application/octet-stream', 'Content-disposition': 'attachment; filename={}'.format(fid)})
+
+    # return send_from_directory(os.path.join(app.root_path, 'recorded'), fid)
+
+with app.test_request_context():
+    print(url_for('download', fid='123b'))
+
+print(app.root_path)
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0')    
