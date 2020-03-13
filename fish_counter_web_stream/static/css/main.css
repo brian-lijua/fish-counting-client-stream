@@ -37,20 +37,16 @@ html, body {
     animation: blinker 5s linear infinite;
 }
 
+.sidenav-trigger.always-show {
+    display: initial;
+}
+
 @media only screen and (min-width: 1000px) {
-    nav .brand-logo {
-        left:8%;
-        -webkit-transform:translateX(-50%);
-        transform:translateX(-50%)
-    }
+
 }
 
 @media only screen and (max-width: 992px) {
-    nav .brand-logo {
-        left:15%;
-        -webkit-transform:translateX(-50%);
-        transform:translateX(-50%)
-    }
+
 }
 
 .show-el {
