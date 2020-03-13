@@ -1,4 +1,4 @@
-from flask import Flask, request, Response, render_template, stream_with_context, send_file, send_from_directory, url_for
+from flask import Flask, request, Response, render_template, stream_with_context, send_file, send_from_directory, url_for, jsonify
 from imutils.video import FileVideoStream, VideoStream
 import os
 import argparse
@@ -79,7 +79,7 @@ def start_recording():
         VIDEO_WRITER_THREAD = Thread(target=writeToVide, args=(VIDEO_WRITER_QUEUE, ))
         VIDEO_WRITER_THREAD.daemon = True
         VIDEO_WRITER_THREAD.start()
-        return Response('started')
+        return Response('Started')
     elif t == 'stop':
         VIDEO_IS_RECORDING = False
         with VIDEO_WRITER_QUEUE.mutex:
@@ -88,18 +88,28 @@ def start_recording():
         VIDEO_WRITER_THREAD.join()
         VIDEO_WRITER_THREAD = None
 
-        return Response('stopped')
+        return Response('Stopped')        
     else:
         return Response('Invalid resposned')
 
-@app.route('/history')
-def history_page():
+def allHistoryFile(reverse=True):
     files = os.listdir(os.path.join(app.root_path, 'recorded'))
-    files = reversed(files)
-    return render_template('history.html', files=files)
+    if reverse:
+        files = reversed(files)
+    return files
 
-@app.route('/download/<path:fid>/')
+@app.route('/history')
+def history_page():    
+    return render_template('history.html', files=allHistoryFile())
+
+@app.route('/download/<fid>/')
 def download(fid):
+    if fid == 'latest':
+        list = allHistoryFile()
+        for l in list:            
+            fid = l
+            break            
+
     fp = os.path.join(app.root_path, 'recorded', fid)
     with open(fp, 'rb') as f:
         retFile = f.read()
@@ -107,9 +117,6 @@ def download(fid):
     return Response(retFile, 200, mimetype='video/mp4', headers={'Content-Type': 'application/octet-stream', 'Content-disposition': 'attachment; filename={}'.format(fid)})
 
     # return send_from_directory(os.path.join(app.root_path, 'recorded'), fid)
-
-with app.test_request_context():
-    print(url_for('download', fid='123b'))
 
 print(app.root_path)
 if __name__ == '__main__':
