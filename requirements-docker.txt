@@ -1,0 +1,4 @@
+Flask
+imutils
+picamera
+numpy
