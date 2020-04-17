@@ -1,0 +1,11 @@
+version: 2
+services:
+    camere_web_service:
+        build: .
+        privileged: true
+        ports:
+            - "5000:5000"
+    rpi_monitor:
+        image: neoraptor/rpi-monitor
+        ports:
+            - "8888:8888"
